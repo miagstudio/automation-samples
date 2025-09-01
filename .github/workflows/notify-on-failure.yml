@@ -1,0 +1,23 @@
+
+name: Notify on Uptime Failure
+
+on:
+  workflow_run:
+    workflows: ["Uptime Check"]
+    types: [completed]
+
+jobs:
+  notify:
+    if: ${{ github.event.workflow_run.conclusion != 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Send Slack/Discord alert
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          python scripts/slack_webhook.py --text "⚠️ Uptime Check failed on $GITHUB_REPOSITORY @ $GITHUB_SHA"
