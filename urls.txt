@@ -1,2 +1,7 @@
 https://example.com
+https://google.com
+https://wikipedia.org
+https://githubstatus.com
+https://github.com/miagstudio/automation-samples
+https://httpstat.us/404
 https://httpstat.us/503
