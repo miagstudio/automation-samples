@@ -2,31 +2,32 @@ name: URL Uptime
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
     paths:
-      - "urls.txt"
-  workflow_dispatch: {}
+      - urls.txt
+  workflow_dispatch:
 
 permissions:
   contents: write
-
-concurrency:
-  group: uptime-${{ github.ref }}
-  cancel-in-progress: true
 
 jobs:
   check:
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
+    concurrency:
+      group: uptime-${{ github.ref }}
+      cancel-in-progress: true
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          persist-credentials: false  # koristićemo GITHUB_TOKEN ručno za push
+          persist-credentials: false  # koristićemo GITHUB_TOKEN za push
 
-      - name: Mark repo as safe (avoid 'dubious ownership')
+      - name: Mark repo as safe
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
       - name: Set up Python
@@ -47,18 +48,15 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-     - name: Run URL check (tolerant)
-  shell: bash
-  run: |
-    set +e
-    python check_urls.py
-    echo "URL check exit code: $?"
-  continue-on-error: true
+      - name: Run URL check (tolerant)
+        shell: bash
+        run: |
+          set +e
+          python check_urls.py
+          echo "URL check exit code: $?"
+        continue-on-error: true
 
-
-
-
-      - name: Prepare authenticated remote for push
+      - name: Prepare auth remote for push
         run: |
           git remote set-url origin "https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
         env:
@@ -70,18 +68,12 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          # Ako nema promena u report.md, izađi uspešno
           if git diff --quiet -- report.md; then
             echo "No changes to commit."
             exit 0
           fi
-
-          # Povuci najnovije i rebase da izbegnemo konflikte
           BR="${GITHUB_REF_NAME:-main}"
           git pull --rebase origin "$BR" || true
-
           git add report.md
           git commit -m "chore(ci): update report [skip ci]"
           git push
-
