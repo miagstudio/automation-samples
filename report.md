@@ -1,6 +1,6 @@
 # URL Uptime Report
 
-Generated: 2025-09-02 13:46:17
+Generated: 2025-09-02 13:56:54
 
 | URL | Status |
 |---|---|
@@ -11,3 +11,7 @@ Generated: 2025-09-02 13:46:17
 | https://github.com/miagstudio/automation-samples | 200 ✅ |
 | https://httpstat.us/404 | ERROR ❌ (SSLError) |
 | https://httpstat.us/503 | ERROR ❌ (SSLError) |
+| https://example.com | 200 ✅ |
+| https://httpstat.us/200 | ERROR ❌ (SSLError) |
+| https://httpstat.us/503 | ERROR ❌ (SSLError) |
+| https://this-domain-should-not-exist.invalid | ERROR ❌ (ConnectionError) |
