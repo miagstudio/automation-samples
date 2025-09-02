@@ -47,11 +47,16 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run URL check (tolerant)
-        run: |
-          set -e
-          python check_urls.py || echo "URL check returned non-zero exit; continuing to commit report if it was written."
-        shell: bash
+     - name: Run URL check (tolerant)
+  shell: bash
+  run: |
+    set +e
+    python check_urls.py
+    echo "URL check exit code: $?"
+  continue-on-error: true
+
+
+
 
       - name: Prepare authenticated remote for push
         run: |
