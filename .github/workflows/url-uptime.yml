@@ -2,10 +2,24 @@
 name: Uptime Check
 
 on:
-  schedule:
-    - cron: "*/30 * * * *"   # every 30 minutes
-  workflow_dispatch:
   push:
+    branches: [ "main" ]
+    paths:
+      - "urls.txt"
+  workflow_dispatch: {}
+name: Uptime
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - "urls.txt"
+  workflow_dispatch: {}
+
+concurrency:
+  group: uptime-${{ github.ref }}
+  cancel-in-progress: true
+
 
 jobs:
   check:
