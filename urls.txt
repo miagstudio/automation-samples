@@ -10,3 +10,4 @@ https://httpstat.us/200
 https://httpstat.us/503
 https://this-domain-should-not-exist.invalid
 https://httpstat.us/404
+https://httpstat.us/404
