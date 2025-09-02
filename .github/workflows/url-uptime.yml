@@ -18,17 +18,30 @@ concurrency:
 jobs:
   check:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0   # potrebno da bismo mogli da push-ujemo nazad
+          fetch-depth: 0  # treba za pull/rebase i push nazad
+
+      - name: Set repo as safe (avoid 'dubious ownership')
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.x"
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
 
       - name: Install dependencies
         run: |
@@ -39,16 +52,10 @@ jobs:
         run: |
           python check_urls.py
 
-      - name: Commit report if changed
+      - name: Commit report if changed (with rebase)
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          if git diff --quiet -- report.md; then
-            echo "No changes to commit."
-          else
-            git add report.md
-            git commit -m "chore(ci): update report [skip ci]"
-            git push
-          fi
+          # Ako
 
